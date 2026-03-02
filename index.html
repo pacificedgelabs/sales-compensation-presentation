@@ -51,6 +51,7 @@ section{padding:60px 0}
 /* TABLES */
 table{width:100%;border-collapse:collapse;margin:16px 0}
 th,td{padding:12px 16px;text-align:right;border-bottom:1px solid var(--border);font-size:.9rem}
+th:not(:first-child),td:not(:first-child){min-width:120px}
 th{color:var(--muted);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:1px}
 td:first-child,th:first-child{text-align:left}
 .money{color:var(--green);font-weight:700}
@@ -151,7 +152,7 @@ td:first-child,th:first-child{text-align:left}
         <p><strong class="money">2%</strong> monthly recurring commission</p>
         <p style="font-size:.85rem;color:var(--muted)">= $40/mo per affiliate (on $2,000 avg revenue)</p>
         <p style="font-size:.8rem;color:var(--gold)">⚠️ Projected — not guaranteed</p>
-        <h4>Plan B — Upfront Bonus</h4>
+        <h4>Plan B — Upfront Commissions</h4>
         <p><strong class="money">$100</strong> per affiliate after 30-day retention</p>
         <p style="font-size:.8rem;color:var(--green)">✅ Guaranteed per retained affiliate</p>
         <h4>Performance Tiers</h4>
@@ -168,7 +169,7 @@ td:first-child,th:first-child{text-align:left}
         <p><strong class="money">1.5%</strong> monthly recurring commission</p>
         <p style="font-size:.85rem;color:var(--muted)">= $30/mo per affiliate (on $2,000 avg revenue)</p>
         <p style="font-size:.8rem;color:var(--gold)">⚠️ Projected — not guaranteed</p>
-        <h4>Plan B — Upfront Bonus</h4>
+        <h4>Plan B — Upfront Commissions</h4>
         <p><strong class="money">$195</strong> per affiliate after 30-day retention</p>
         <p style="font-size:.8rem;color:var(--green)">✅ Guaranteed per retained affiliate</p>
         <h4>Performance Tiers</h4>
@@ -229,7 +230,7 @@ td:first-child,th:first-child{text-align:left}
 
     <div id="closer-b" class="tab-content">
       <p style="color:var(--muted);margin-bottom:12px">Plan B pays <strong>$15/close + $100 per affiliate</strong> after 30-day retention. Predictable and front-loaded.</p>
-      <p style="color:var(--green);font-size:.85rem;margin-bottom:20px">✅ Bonus amounts are <strong>guaranteed</strong> for every affiliate that hits 30-day retention — regardless of affiliate performance.</p>
+      <p style="color:var(--green);font-size:.85rem;margin-bottom:20px">✅ Commission amounts are <strong>guaranteed</strong> for every affiliate that hits 30-day retention — regardless of affiliate performance.</p>
       <div id="closer-b-table"></div>
       <div class="grid grid-3" style="margin-top:24px">
         <div class="card" style="text-align:center;border-color:var(--blue)">
@@ -281,8 +282,8 @@ td:first-child,th:first-child{text-align:left}
 
     <div id="setter-b" class="tab-content">
       <p style="color:var(--muted);margin-bottom:12px">Plan B pays <strong>$15/set + $195 per affiliate</strong> after 30-day retention. Massive upfront payouts.</p>
-      <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px">📊 Base pay is earned on every set that shows. Bonus is earned on closed affiliates (approx. 50% close rate).</p>
-      <p style="color:var(--green);font-size:.85rem;margin-bottom:20px">✅ Bonus amounts are <strong>guaranteed</strong> for every affiliate that hits 30-day retention — regardless of affiliate performance.</p>
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:8px">📊 Base pay is earned on every set that shows. Commissions are earned on closed affiliates (approx. 50% close rate).</p>
+      <p style="color:var(--green);font-size:.85rem;margin-bottom:20px">✅ Commission amounts are <strong>guaranteed</strong> for every affiliate that hits 30-day retention — regardless of affiliate performance.</p>
       <div id="setter-b-table"></div>
       <div class="grid grid-3" style="margin-top:24px">
         <div class="card" style="text-align:center;border-color:var(--blue)">
@@ -458,7 +459,7 @@ const setterTiers = [20, 40, 100];
 function buildTable(containerId, role, plan) {
   const p = role === 'closer' ? CP : SP;
   const t = role === 'closer' ? closerTiers : setterTiers;
-  const commLabel = plan === 'a' ? 'Commission' : 'Bonus';
+  const commLabel = plan === 'a' ? 'Commission' : 'Commissions';
   // Pre-compute all 12 months for each tier
   const allData = t.map(v => calcEarnings(12, v, p.base, p.recA, p.bonusB, plan, role));
   const rows = [];
@@ -475,7 +476,7 @@ function buildTable(containerId, role, plan) {
     rows.push('</tr>');
     // Total row
     rows.push(`<tr${highlight}>`);
-    rows.push(t.map((_, i) => `<td class="money" style="padding:2px 16px 8px;border-bottom:1px solid var(--border);font-size:.95rem">${fmt(allData[i][idx].total)}</td>`).join(''));
+    rows.push(t.map((_, i) => `<td class="money" style="padding:2px 16px 8px;border-bottom:1px solid var(--border);font-size:.95rem"><span style="font-size:.7rem;color:var(--muted);font-weight:400">Total payout:</span><br>${fmt(allData[i][idx].total)}</td>`).join(''));
     rows.push('</tr>');
   }
   const el = document.getElementById(containerId);
@@ -639,7 +640,7 @@ function buildStories() {
     { name: '🎯 The Strategist — Setter, Plan B, 40/mo', scenario: 'Maximizing upfront with the highest per-affiliate payout',
       calc: () => {
         const d = calcEarnings(12, 40, SP.base, SP.recA, SP.bonusB, 'b', 'setter');
-        return `Monthly income (after M1): ${fmt(d[1].total)}<br>Year 1 Total: <strong>${fmt(d[11].cumTotal)}</strong><br>That's ${fmt(d[1].bonus)} in bonuses every month!`;
+        return `Monthly income (after M1): ${fmt(d[1].total)}<br>Year 1 Total: <strong>${fmt(d[11].cumTotal)}</strong><br>That's ${fmt(d[1].bonus)} in commissions every month!`;
       }
     },
     { name: '🔥 The Top Setter — Setter, Plan A, 100/mo', scenario: 'Top performer setter with compounding recurring income',
