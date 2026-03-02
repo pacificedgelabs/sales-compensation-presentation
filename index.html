@@ -167,8 +167,10 @@ td:first-child,th:first-child{text-align:left}
         <p style="font-size:.85rem;color:var(--muted)">= $30/mo per affiliate (on $2,000 avg revenue)</p>
         <h4>Plan B — Upfront Bonus</h4>
         <p><strong class="money">$195</strong> per affiliate after 30-day retention</p>
-        <h4>The Setter Advantage</h4>
-        <p style="font-size:.9rem;color:var(--muted);margin-top:12px">Higher Plan B payout reflects the critical role setters play in building the pipeline. $195 upfront is one of the most competitive setter bonuses in the industry.</p>
+        <h4>Performance Tiers</h4>
+        <div class="bar-wrap"><div class="bar-label"><span>Minimum</span><span>20/mo</span></div><div class="bar"><div class="bar-fill blue" data-width="20%"></div></div></div>
+        <div class="bar-wrap"><div class="bar-label"><span>Average</span><span>40/mo</span></div><div class="bar"><div class="bar-fill blue" data-width="40%"></div></div></div>
+        <div class="bar-wrap"><div class="bar-label"><span>Top Performer</span><span>100/mo</span></div><div class="bar"><div class="bar-fill blue" data-width="100%"></div></div></div>
       </div>
     </div>
 
@@ -261,16 +263,16 @@ td:first-child,th:first-child{text-align:left}
       <div id="setter-a-table"></div>
       <div class="grid grid-3" style="margin-top:24px">
         <div class="card" style="text-align:center;border-color:var(--green)">
-          <div class="label">Year 1 Total — 30/mo</div>
-          <div class="big-num" id="sa-total-30"></div>
+          <div class="label">Year 1 Total — 20/mo</div>
+          <div class="big-num" id="sa-total-20"></div>
+        </div>
+        <div class="card" style="text-align:center;border-color:var(--green)">
+          <div class="label">Year 1 Total — 40/mo</div>
+          <div class="big-num" id="sa-total-40"></div>
         </div>
         <div class="card" style="text-align:center;border-color:var(--green)">
           <div class="label">Year 1 Total — 100/mo</div>
           <div class="big-num" id="sa-total-100"></div>
-        </div>
-        <div class="card" style="text-align:center;border-color:var(--green)">
-          <div class="label">Year 1 Total — 150/mo</div>
-          <div class="big-num" id="sa-total-150"></div>
         </div>
       </div>
     </div>
@@ -280,16 +282,16 @@ td:first-child,th:first-child{text-align:left}
       <div id="setter-b-table"></div>
       <div class="grid grid-3" style="margin-top:24px">
         <div class="card" style="text-align:center;border-color:var(--blue)">
-          <div class="label">Year 1 Total — 30/mo</div>
-          <div class="big-num blue" id="sb-total-30"></div>
+          <div class="label">Year 1 Total — 20/mo</div>
+          <div class="big-num blue" id="sb-total-20"></div>
+        </div>
+        <div class="card" style="text-align:center;border-color:var(--blue)">
+          <div class="label">Year 1 Total — 40/mo</div>
+          <div class="big-num blue" id="sb-total-40"></div>
         </div>
         <div class="card" style="text-align:center;border-color:var(--blue)">
           <div class="label">Year 1 Total — 100/mo</div>
           <div class="big-num blue" id="sb-total-100"></div>
-        </div>
-        <div class="card" style="text-align:center;border-color:var(--blue)">
-          <div class="label">Year 1 Total — 150/mo</div>
-          <div class="big-num blue" id="sb-total-150"></div>
         </div>
       </div>
     </div>
@@ -330,7 +332,7 @@ td:first-child,th:first-child{text-align:left}
       <div class="card" style="text-align:center">
         <div class="label">Setter Break-Even</div>
         <div class="big-num gold" id="setter-breakeven"></div>
-        <div class="label">months (at 100 sets/mo)</div>
+        <div class="label">months (at 40 sets/mo)</div>
       </div>
       <div class="card" style="text-align:center">
         <div class="label">Plan A Year 1 Advantage</div>
@@ -436,14 +438,16 @@ const CP = { base: 15, recA: 40, bonusB: 100 };
 // Setter params
 const SP = { base: 15, recA: 30, bonusB: 195 };
 
-const tiers = [30, 100, 150];
+const closerTiers = [30, 100, 150];
+const setterTiers = [20, 40, 100];
 
 // ========== BUILD TABLES ==========
 function buildTable(containerId, role, plan) {
   const p = role === 'closer' ? CP : SP;
+  const t = role === 'closer' ? closerTiers : setterTiers;
   const rows = [];
   for (let m = 1; m <= 12; m++) {
-    const cells = tiers.map(v => {
+    const cells = t.map(v => {
       const d = calcEarnings(m, v, p.base, p.recA, p.bonusB, plan);
       return d[m - 1].total;
     });
@@ -451,12 +455,13 @@ function buildTable(containerId, role, plan) {
     rows.push(`<tr${highlight}><td>Month ${m}</td>${cells.map(c => `<td class="money">${fmt(c)}</td>`).join('')}</tr>`);
   }
   const el = document.getElementById(containerId);
-  el.innerHTML = `<table><tr><th>Month</th>${tiers.map(v => `<th>${v}/mo</th>`).join('')}</tr>${rows.join('')}</table>`;
+  el.innerHTML = `<table><tr><th>Month</th>${t.map(v => `<th>${v}/mo</th>`).join('')}</tr>${rows.join('')}</table>`;
 }
 
 function buildTotals(prefix, role, plan) {
   const p = role === 'closer' ? CP : SP;
-  tiers.forEach(v => {
+  const t = role === 'closer' ? closerTiers : setterTiers;
+  t.forEach(v => {
     const d = calcEarnings(12, v, p.base, p.recA, p.bonusB, plan);
     const total = d[11].cumTotal;
     document.getElementById(`${prefix}-total-${v}`).textContent = fmt(total);
@@ -496,13 +501,14 @@ const chartColors = {
 
 function buildProjectionChart(role) {
   const p = role === 'closer' ? CP : SP;
+  const t = role === 'closer' ? closerTiers : setterTiers;
   const canvasId = role === 'closer' ? 'chartCloser' : 'chartSetter';
   const labels = Array.from({length:12}, (_,i) => `Month ${i+1}`);
   const datasets = [];
   const colors = [chartColors.greenA, chartColors.blueB, chartColors.gold];
   const bgColors = [chartColors.greenABg, chartColors.blueBBg, chartColors.goldBg];
 
-  tiers.forEach((v, i) => {
+  t.forEach((v, i) => {
     const dA = calcEarnings(12, v, p.base, p.recA, p.bonusB, 'a');
     datasets.push({
       label: `Plan A — ${v}/mo`,
@@ -566,9 +572,9 @@ function buildBreakevenChart() {
   for (let m = 0; m < 12; m++) { if (dA[m].cumTotal >= dB[m].cumTotal) { be = m + 1; break; } }
   $('#closer-breakeven').textContent = be + (typeof be === 'number' ? '' : '');
 
-  // Setter break-even
-  const sA = calcEarnings(12, 100, SP.base, SP.recA, SP.bonusB, 'a');
-  const sB = calcEarnings(12, 100, SP.base, SP.recA, SP.bonusB, 'b');
+  // Setter break-even (at average 40 sets/mo)
+  const sA = calcEarnings(12, 40, SP.base, SP.recA, SP.bonusB, 'a');
+  const sB = calcEarnings(12, 40, SP.base, SP.recA, SP.bonusB, 'b');
   let sbe = '12+';
   for (let m = 0; m < 12; m++) { if (sA[m].cumTotal >= sB[m].cumTotal) { sbe = m + 1; break; } }
   $('#setter-breakeven').textContent = sbe;
@@ -600,16 +606,22 @@ function buildStories() {
         return `Monthly income (after M1): ${fmt(d[1].total)}<br>Year 1 Total: <strong>${fmt(d[11].cumTotal)}</strong>`;
       }
     },
-    { name: '📈 The Empire Builder — Setter, Plan A, 100/mo', scenario: 'Building a recurring revenue machine',
+    { name: '📈 The Empire Builder — Setter, Plan A, 40/mo', scenario: 'Average performer building a recurring revenue machine',
       calc: () => {
-        const d = calcEarnings(12, 100, SP.base, SP.recA, SP.bonusB, 'a');
+        const d = calcEarnings(12, 40, SP.base, SP.recA, SP.bonusB, 'a');
         return `Month 1: ${fmt(d[0].total)} → Month 12: ${fmt(d[11].total)}<br>Year 1 Total: <strong>${fmt(d[11].cumTotal)}</strong><br>Monthly by Month 12: <strong>${fmt(d[11].recurring)}</strong> in recurring alone!`;
       }
     },
-    { name: '🎯 The Strategist — Setter, Plan B, 100/mo', scenario: 'Maximizing upfront with the highest per-affiliate payout',
+    { name: '🎯 The Strategist — Setter, Plan B, 40/mo', scenario: 'Maximizing upfront with the highest per-affiliate payout',
       calc: () => {
-        const d = calcEarnings(12, 100, SP.base, SP.recA, SP.bonusB, 'b');
+        const d = calcEarnings(12, 40, SP.base, SP.recA, SP.bonusB, 'b');
         return `Monthly income (after M1): ${fmt(d[1].total)}<br>Year 1 Total: <strong>${fmt(d[11].cumTotal)}</strong><br>That's ${fmt(d[1].bonus)} in bonuses every month!`;
+      }
+    },
+    { name: '🔥 The Top Setter — Setter, Plan A, 100/mo', scenario: 'Top performer setter with compounding recurring income',
+      calc: () => {
+        const d = calcEarnings(12, 100, SP.base, SP.recA, SP.bonusB, 'a');
+        return `Month 1: ${fmt(d[0].total)} → Month 12: ${fmt(d[11].total)}<br>Year 1 Total: <strong>${fmt(d[11].cumTotal)}</strong><br>💰 ${fmt(d[11].recurring)} in recurring by month 12!`;
       }
     },
     { name: '🚀 The Minimum Viable Hustler — Closer, Plan A, 30/mo', scenario: 'Even at minimum effort, watch it grow',
